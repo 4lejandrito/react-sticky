@@ -11,16 +11,17 @@ var React = require('react'),
 
   handleResize: function() {
     // set style with callback to reset once style rendered succesfully
-    this.setState({ style: {} }, this.reset);
+    this.setState({ style: {}, className: this.props.stickyClass }, this.reset);
   },
 
   handleScroll: function() {
     if (window.pageYOffset > this.elementOffset) this.setState({ style: this.props.stickyStyle });
-    else this.setState({ style: {} });
+    else this.setState({ style: {}, className: '' });
   },
 
   getDefaultProps: function() {
     return {
+      stickyClass: 'sticky',
       stickyStyle: {
         position: 'fixed',
         top: 0,
@@ -49,7 +50,8 @@ var React = require('react'),
 
   render: function() {
     return React.DOM.div({
-      style: this.state.style
+      style: this.state.style,
+      className: this.state.className
     }, this.props.children);
   }
 });
