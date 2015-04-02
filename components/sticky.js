@@ -1,4 +1,5 @@
-var React = require('react'), Sticky = React.createClass({
+var React = require('react'), _ = require('underscore'),
+Sticky = React.createClass({
   reset: function() {
     var html = document.documentElement,
         body = document.body,
@@ -44,8 +45,8 @@ var React = require('react'), Sticky = React.createClass({
 
   componentDidMount: function() {
     this.reset();
-    window.addEventListener('scroll', this.handleScroll);
-    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('scroll', _.throttle(this.handleScroll, 100));
+    window.addEventListener('resize', _.throttle(this.handleResize, 100));
   },
 
   componentWillUnmount: function() {
