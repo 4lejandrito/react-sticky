@@ -3,25 +3,24 @@ Sticky = React.createClass({
   reset: function() {
     var html = document.documentElement,
         body = document.body,
-        windowOffset = window.pageYOffset || (html.clientHeight ? html : body).scrollTop;
+        windowOffset = window.pageYOffset || (html.clientHeight ? html : body).scrollTop,
+        elementOffset = this.getDOMNode().getBoundingClientRect().top + windowOffset;
 
-    this.elementOffset = this.getDOMNode().getBoundingClientRect().top + windowOffset;
+    this.setState({
+      originalHeight: this.getDOMNode().offsetHeight,
+      originalOffset: elementOffset,
+      sticky: windowOffset >= elementOffset
+    });
   },
 
   handleResize: function() {
-    // set style with callback to reset once style rendered succesfully
-    this.setState({ style: {}, className: '' }, this.reset);
+    this.setState({sticky: false}, this.reset);
   },
 
   handleScroll: function() {
-    if (window.pageYOffset > this.elementOffset) {
-      this.setState({
-        style: this.props.stickyStyle,
-        className: this.props.stickyClass
-      });
-    } else {
-      this.setState({ style: {}, className: '' });
-    }
+    this.setState({
+      sticky: window.pageYOffset >= this.state.originalOffset
+    });
   },
 
   getDefaultProps: function() {
@@ -39,14 +38,18 @@ Sticky = React.createClass({
 
   getInitialState: function() {
     return {
-      style: {}
+      sticky: false,
+      originalHeight: 0,
+      originalOffset: Infinity
     };
   },
 
   componentDidMount: function() {
-    this.reset();
-    window.addEventListener('scroll', _.throttle(this.handleScroll, 100));
-    window.addEventListener('resize', _.throttle(this.handleResize, 100));
+    // To avoid invalid heights:
+    // http://stackoverflow.com/questions/21289115/element-height-incorrect-because-browser-hasnt-finished-rendering-it
+    setTimeout(this.reset, 100);
+    window.addEventListener('scroll', _.throttle(this.handleScroll, 10));
+    window.addEventListener('resize', _.debounce(this.handleResize, 10));
   },
 
   componentWillUnmount: function() {
@@ -54,10 +57,19 @@ Sticky = React.createClass({
     window.removeEventListener('resize', this.handleResize);
   },
 
+  componentDidUpdate: function(prevProps, prevState) {
+    var parent = this.getDOMNode().parentNode;
+    if (this.state.sticky) {
+      parent.style.paddingTop = this.state.originalHeight + "px";
+    } else {
+      parent.style.paddingTop = "0px";
+    }
+  },
+
   render: function() {
     return this.props.type({
-      style: this.state.style,
-      className: this.state.className
+      style: this.state.sticky ? this.props.stickyStyle : {},
+      className: this.state.sticky ? this.props.stickyClass : ''
     }, this.props.children);
   }
 });
