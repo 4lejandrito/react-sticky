@@ -48,8 +48,8 @@ Sticky = React.createClass({
     // To avoid invalid heights:
     // http://stackoverflow.com/questions/21289115/element-height-incorrect-because-browser-hasnt-finished-rendering-it
     setTimeout(this.reset, 100);
-    window.addEventListener('scroll', _.throttle(this.handleScroll, 10));
-    window.addEventListener('resize', _.debounce(this.handleResize, 10));
+    window.addEventListener('scroll', this.handleScroll = _.throttle(this.handleScroll, 10));
+    window.addEventListener('resize', this.handleResize = _.debounce(this.handleResize, 10));
   },
 
   componentWillUnmount: function() {
