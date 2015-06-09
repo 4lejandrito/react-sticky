@@ -9,7 +9,7 @@ Sticky = React.createClass({
     this.setState({
       originalHeight: this.getDOMNode().offsetHeight,
       originalOffset: elementOffset,
-      sticky: windowOffset >= elementOffset
+      sticky: windowOffset >= elementOffset + this.props.stickyOffset
     });
   },
 
@@ -19,7 +19,7 @@ Sticky = React.createClass({
 
   handleScroll: function() {
     this.setState({
-      sticky: window.pageYOffset >= this.state.originalOffset
+      sticky: window.pageYOffset >= this.state.originalOffset + this.props.stickyOffset
     });
   },
 
@@ -27,6 +27,7 @@ Sticky = React.createClass({
     return {
       type: React.DOM.div,
       stickyClass: 'sticky',
+      stickyOffset: 0,
       stickyStyle: {
         position: 'fixed',
         top: 0,
